@@ -1,0 +1,157 @@
+schema: '2.0'
+stages:
+  evaluate:
+    cmd: python src/models/evaluate.py predictions/val_predict.pkl data/interim/val_target.pkl
+      metrics/evaluation.json
+    deps:
+    - path: data/interim/val_target.pkl
+      md5: 168e50a9e5b9f909c104415ad545f506
+      size: 5078
+    - path: predictions/val_predict.pkl
+      md5: 74e00b137041f276c998614062c7951b
+      size: 1107
+    - path: src/models/evaluate.py
+      md5: 87e158d912b5a4cd2639323409b55341
+      size: 1299
+    outs:
+    - path: metrics/evaluation.json
+      md5: ed3dc82ee11a5a687f90043c012604c5
+      size: 41
+  preprocess_test_data:
+    cmd: python src/data/make_dataset.py data/raw/test.csv --output_data_filepath
+      data/interim/test.pkl
+    deps:
+    - path: data/raw/test.csv
+      md5: f4088e849b8f561eb3e9055a4251567a
+      size: 248941
+    - path: src/data/make_dataset.py
+      md5: f0a30cc65b62d70ee55062a278cfe435
+      size: 2472
+    - path: src/data/preprocess.py
+      md5: e553d6d81c86271f43724a0cc882eed6
+      size: 1329
+    outs:
+    - path: data/interim/test.pkl
+      md5: d921a686f406ed24e2e5abc1ca0c46f9
+      size: 43138
+  test_feature_generation:
+    cmd: python src/features/build_features.py data/interim/test.pkl data/processed/test.pkl
+    deps:
+    - path: data/interim/test.pkl
+      md5: d921a686f406ed24e2e5abc1ca0c46f9
+      size: 43138
+    - path: src/features/build_features.py
+      md5: b6ac28f9404e0b8ec3c53938db714142
+      size: 1205
+    - path: src/features/features.py
+      md5: e7346b30cf4c3b231e9aa7da1ef201c8
+      size: 101
+    outs:
+    - path: data/processed/test.pkl
+      md5: d921a686f406ed24e2e5abc1ca0c46f9
+      size: 43138
+  preprocess_train_data:
+    cmd: python src/data/make_dataset.py data/raw/train.csv --output_train_data_filepath
+      data/interim/train_data.pkl --output_train_target_filepath data/interim/train_target.pkl
+      --output_val_data_filepath data/interim/val_data.pkl --output_val_target_filepath
+      data/interim/val_target.pkl
+    deps:
+    - path: data/raw/train.csv
+      md5: 3fe5dc9c07027b120ea0ff061018594d
+      size: 399312
+    - path: src/data/make_dataset.py
+      md5: f0a30cc65b62d70ee55062a278cfe435
+      size: 2472
+    - path: src/data/preprocess.py
+      md5: e553d6d81c86271f43724a0cc882eed6
+      size: 1329
+    outs:
+    - path: data/interim/train_data.pkl
+      md5: 28406b6ff16695fc302f94cb6420b799
+      size: 50353
+    - path: data/interim/train_target.pkl
+      md5: 78548e210d4fb897514f334859ba6391
+      size: 17117
+    - path: data/interim/val_data.pkl
+      md5: e9f2d838095e8918b340cb17b9cc366e
+      size: 17677
+    - path: data/interim/val_target.pkl
+      md5: 168e50a9e5b9f909c104415ad545f506
+      size: 5078
+  train_feature_generation:
+    cmd: python src/features/build_features.py data/interim/train_data.pkl data/processed/train_data.pkl;
+      python src/features/build_features.py data/interim/val_data.pkl data/processed/val_data.pkl
+    deps:
+    - path: data/interim/train_data.pkl
+      md5: 28406b6ff16695fc302f94cb6420b799
+      size: 50353
+    - path: data/interim/val_data.pkl
+      md5: e9f2d838095e8918b340cb17b9cc366e
+      size: 17677
+    - path: src/features/build_features.py
+      md5: b6ac28f9404e0b8ec3c53938db714142
+      size: 1205
+    - path: src/features/features.py
+      md5: e7346b30cf4c3b231e9aa7da1ef201c8
+      size: 101
+    outs:
+    - path: data/processed/train_data.pkl
+      md5: 28406b6ff16695fc302f94cb6420b799
+      size: 50353
+    - path: data/processed/val_data.pkl
+      md5: e9f2d838095e8918b340cb17b9cc366e
+      size: 17677
+  train_sklearn_model:
+    cmd: python src/models/train_model.py data/processed/train_data.pkl data/interim/train_target.pkl
+      models/sklearn_model.pkl
+    deps:
+    - path: data/interim/train_target.pkl
+      md5: 78548e210d4fb897514f334859ba6391
+      size: 17117
+    - path: data/processed/train_data.pkl
+      md5: 28406b6ff16695fc302f94cb6420b799
+      size: 50353
+    - path: src/models/predict_model.py
+      md5: 37836dfeefa8b07868a101f0b8e5e1fa
+      size: 1300
+    - path: src/models/sklearn_model.py
+      md5: 6a8d569b20539d7d061679c6144ff144
+      size: 1003
+    outs:
+    - path: models/sklearn_model.pkl
+      md5: da0fea67f5c4387b76c51c00e9857d90
+      size: 103783
+  predict_val_sklearn_model:
+    cmd: python src/models/predict_model.py data/processed/val_data.pkl models/sklearn_model.pkl
+      predictions/val_predict.pkl
+    deps:
+    - path: data/processed/val_data.pkl
+      md5: e9f2d838095e8918b340cb17b9cc366e
+      size: 17677
+    - path: models/sklearn_model.pkl
+      md5: da0fea67f5c4387b76c51c00e9857d90
+      size: 103783
+    - path: src/models/predict_model.py
+      md5: 37836dfeefa8b07868a101f0b8e5e1fa
+      size: 1300
+    outs:
+    - path: predictions/val_predict.pkl
+      md5: 74e00b137041f276c998614062c7951b
+      size: 1107
+  predict_test_sklearn_model:
+    cmd: python src/models/predict_model.py data/processed/test.pkl models/sklearn_model.pkl
+      predictions/test_predict.pkl
+    deps:
+    - path: data/processed/test.pkl
+      md5: d921a686f406ed24e2e5abc1ca0c46f9
+      size: 43138
+    - path: models/sklearn_model.pkl
+      md5: da0fea67f5c4387b76c51c00e9857d90
+      size: 103783
+    - path: src/models/predict_model.py
+      md5: 37836dfeefa8b07868a101f0b8e5e1fa
+      size: 1300
+    outs:
+    - path: predictions/test_predict.pkl
+      md5: 0404d90dfa93b9ff63d02eb438bb3667
+      size: 3343

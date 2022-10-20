@@ -10,17 +10,22 @@ from features import add_early_wakeup
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_data_filepath', type=click.Path())
-def main(input_filepath, output_data_filepath):
+@click.argument('output_filepath', type=click.Path())
+
+
+def main(
+    input_filepath, 
+    output_filepath
+    ):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    logger.info('making final data set from interim data')
 
     df = pd.read_pickle(input_filepath)
-    df = add_early_wakeup(df)
-    save_as_pickle(df, output_data_filepath)
+    save_as_pickle(df, output_filepath)
+
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

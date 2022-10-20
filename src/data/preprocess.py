@@ -45,5 +45,5 @@ def preprocess_target(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def extract_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    df, target = df.drop(cfg.TARGET_COLS, axis=1), df[TARGET_COLS]
+    df, target = df.drop(cfg.TARGET_COLS, axis=1), df[TARGET_COLS].copy()
     return df, target
