@@ -11,7 +11,7 @@ import pandas as pd
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_data_filepath', type=click.Path())
-@click.argument('output_target_filepath', type=click.Path())
+@click.option('--output_target_filepath', type=click.Path(), default=None)
 def main(input_filepath, output_data_filepath, output_target_filepath=None):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
